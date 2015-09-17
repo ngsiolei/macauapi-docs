@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<meta name="format-detection" content="telephone=no" />
+<title>Macau API Test 01</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+}
+:focus {
+  outline:none;
+}
+::-moz-focus-inner {
+  border: 0;
+}
+body {
+  font-size: 18px;
+  font-family: monospace;
+  line-height: 30px;
+}
+h1 {
+  font-size: 32px;
+  font-weight: normal;
+  line-height: 40px;
+  margin-bottom: 10px;
+  padding-left: 6px;
+}
+a:link {
+  color: #336699;
+  text-decoration: none;
+}
+a:visited {
+  color: #336699;
+  text-decoration: none;
+}
+a:hover {
+  color: #336699;
+  text-decoration: none;
+}
+a:active {
+  color: #336699;
+  text-decoration: none;
+}
+#search-input {
+  border: 1px solid #CCCCCC;
+  box-sizing: border-box;  
+  font-size: 18px;
+  font-family: monospace;
+  line-height: 30px;
+  padding: 6px;
+  width: 100%;
+}
+#result-list {
+  border-top: 4px solid #EEEEEE;
+}
+.item {
+  border-bottom: 1px solid #EEEEEE;
+}
+.item a {
+  display: block;
+  padding: 6px;
+}
+.item-name {
+}
+.item-type {
+  font-size: 12px;
+  line-height: 20px;
+}
+</style>
+</head>
+<body>
+<h1>Macau API test 01</h1>
+<input type="text" name="search-input" id="search-input" placeholder="Type Macau biz, street, building to search" />
+<ul id="result-list"></ul>
+
+<script>
+$(function () {
+  var isOninputSupported = function (el) {
+    var eventName = 'oninput';
+    var isSupported = (eventName in el);
+    if (!isSupported) {
+      el.setAttribute(eventName, 'return;');
+      isSupported = typeof el[eventName] == 'function';
+    }
+    return isSupported;
+  };
+  var escapeHTML = function (s) {
+   if (s && typeof s === 'string') {
+     s = s.replace(/</g, "&#60;");
+     s = s.replace(/>/g, "&#62;");
+     s = s.replace(/\"/g, '&#34;');
+     s = s.replace(/\'/g, '&#39;');
+     return s;
+   }
+   return s;
+  };
+  if (isOninputSupported($('#search-input').get(0))) {
+    $('#search-input').get(0).oninput = function () {
+      suggest();
+    }; 
+  } else {
+    $('#route-search-input').keyup(function () {
+      suggest();
+    });
+  }
+  var suggest = function () {
+    var params = {};
+    params.q = $('#search-input').val();
+    var q = encodeURIComponent(params.q.replace(/(^\s+)|(\s+$)/g, ''));
+    if (q === '') {
+      return;
+    }
+    var jqxhr = $.get(
+      'https://macauapi.com/v0/places/suggest',
+      params,
+      function (res) {
+        if (res.ok === true && res.data) {
+          var data = res.data;
+        } else {
+          console.log(res.ok === true);
+          console.log('debug');
+          return;
+        }
+        if (params.q === $('#search-input').val()) {
+          $('#result-list').empty();
+          for (var i = 0; i < data.length; i++) {
+            var name = escapeHTML(data[i].name);
+            var lat = escapeHTML(data[i].lat);
+            var lng = escapeHTML(data[i].lng);
+            var type = escapeHTML(data[i].type) || 'other';
+            var locality = escapeHTML(data[i].locality);
+            var description = type;
+            if (description === 'business' &&
+                data[i].cat &&
+                data[i].cat.length > 0) {
+              description = data[i].cat.join(', ');
+            }
+            if (locality !== '') {
+              if (description.length > 0) {
+                description += ' / ' + locality;
+              } else {
+                description += locality;
+              }
+            }
+            var link = $('<a href="#" data-attr="'+ name + '|' + lat + '|' + lng + '">' + 
+                         '<div class="item-name">' + name + '</div>' +
+                         '<div class="item-type">' + description  + '</div>' +
+                         '</a>');
+            link.click(function (e) {
+              e.preventDefault();
+              console.log($(this).attr('data-attr'));
+            });
+            $('<li></li>').append(link)
+                          .addClass('item')
+                          .appendTo($('#result-list'));
+          }
+        }
+      },
+      'jsonp'
+    );
+  };
+});
+</script>
+</body>
+</html>
