@@ -120,10 +120,6 @@ $(function () {
       function (res) {
         if (res.ok === true && res.data) {
           var data = res.data;
-        } else {
-          console.log(res.ok === true);
-          console.log('debug');
-          return;
         }
         if (params.q === $('#search-input').val()) {
           $('#result-list').empty();
