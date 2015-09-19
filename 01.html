@@ -47,6 +47,8 @@ a:active {
 }
 #search-input {
   border: 1px solid #CCCCCC;
+  border-left-width: none;
+  border-right-width: none;
   box-sizing: border-box;  
   font-size: 18px;
   font-family: monospace;
@@ -74,11 +76,12 @@ a:active {
 </head>
 <body>
 <h1>Macau API test 01</h1>
-<input type="text" name="search-input" id="search-input" placeholder="Type Macau biz, street, building to search" />
+<input type="text" id="search-input" placeholder="Type Macau biz, street, building to search" />
 <ul id="result-list"></ul>
 
 <script>
 $(function () {
+  $('#search-input').focus();
   var isOninputSupported = function (el) {
     var eventName = 'oninput';
     var isSupported = (eventName in el);
