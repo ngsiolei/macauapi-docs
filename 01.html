@@ -111,32 +111,36 @@ $(function () {
     });
   }
   var suggest = function () {
+    $('#result-list').empty();
     var params = {};
-    params.q = $('#search-input').val();
-    var q = encodeURIComponent(params.q.replace(/(^\s+)|(\s+$)/g, ''));
+    var oriQ = $('#search-input').val();
+    var q = oriQ.replace(/(^\s+)|(\s+$)/g, '');
     if (q === '') {
       return;
     }
+    var params = {'q': encodeURIComponent(q)};
     var jqxhr = $.get(
       'https://macauapi.com/v0/places/suggest',
       params,
       function (res) {
         if (res.ok === true && res.data) {
           var data = res.data;
+        } else {
+          return;
         }
-        if (params.q === $('#search-input').val()) {
-          $('#result-list').empty();
-          for (var i = 0; i < data.length; i++) {
-            var name = escapeHTML(data[i].name);
-            var lat = escapeHTML(data[i].lat);
-            var lng = escapeHTML(data[i].lng);
-            var type = escapeHTML(data[i].type) || 'other';
-            var locality = escapeHTML(data[i].locality);
+        if (oriQ === $('#search-input').val()) {
+          for (var i = 0, l = data.length; i < l; i++) {
+            var d = data[i];
+            var name = escapeHTML(d.name);
+            var lat = escapeHTML(d.lat);
+            var lng = escapeHTML(d.lng);
+            var type = escapeHTML(d.type) || 'other';
+            var locality = escapeHTML(d.locality);
             var description = type;
             if (description === 'business' &&
-                data[i].cat &&
-                data[i].cat.length > 0) {
-              description = data[i].cat.join(', ');
+                d.cat &&
+                d.cat.length > 0) {
+              description = d.cat.join(', ');
             }
             if (locality !== '') {
               if (description.length > 0) {
