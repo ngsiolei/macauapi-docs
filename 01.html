@@ -118,7 +118,7 @@ $(function () {
     if (q === '') {
       return;
     }
-    var params = {'q': encodeURIComponent(q)};
+    var params = {'q': q};
     var jqxhr = $.get(
       'https://macauapi.com/v0/places/suggest',
       params,
