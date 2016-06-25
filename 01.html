@@ -106,13 +106,12 @@ $(function () {
       suggest();
     }; 
   } else {
-    $('#route-search-input').keyup(function () {
+    $('#search-input').keyup(function () {
       suggest();
     });
   }
   var suggest = function () {
     $('#result-list').empty();
-    var params = {};
     var oriQ = $('#search-input').val();
     var q = oriQ.replace(/(^\s+)|(\s+$)/g, '');
     if (q === '') {
