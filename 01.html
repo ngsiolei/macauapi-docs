@@ -128,6 +128,7 @@ $(function () {
           return;
         }
         if (oriQ === $('#search-input').val()) {
+          $('#result-list').empty();
           for (var i = 0, l = data.length; i < l; i++) {
             var d = data[i];
             var name = escapeHTML(d.name);
